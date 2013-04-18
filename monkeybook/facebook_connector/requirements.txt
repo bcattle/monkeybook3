@@ -1,0 +1,4 @@
+mongoengine
+celery-with-mongodb
+facebook-sdk
+raven
