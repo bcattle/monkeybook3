@@ -1,0 +1,2 @@
+# Needed for UserMixin
+Flask-Login
