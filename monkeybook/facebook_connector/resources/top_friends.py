@@ -1,12 +1,16 @@
-import datetime
-from pytz import utc
-from monkeybook.fql.base import FQLTask
-from monkeybook.fql.getter import ResultGetter
-# TODO: remove this dependency
-from monkeybook.books.yearbook2012.settings import *
+from monkeybook.facebook_connector.resources import FqlResource
+from monkeybook.facebook_connector.results import ResourceResult, ResultField, IntegerField, TimestampField
 
 
-class GetFriendsTask(FQLTask):
+class FriendsResult(ResourceResult):
+    uid = IntegerField(required=True)
+    name = ResultField(required=True)
+    first_name = ResultField()
+    pic_square = ResultField(required=True)
+    sex = ResultField()
+
+
+class FriendsResource(FqlResource):
     """
     Pulls all of the user's friends
     """
@@ -14,44 +18,37 @@ class GetFriendsTask(FQLTask):
         SELECT uid, first_name, name, pic_square, sex FROM user
             WHERE uid IN (SELECT uid2 FROM friend WHERE uid1 = me())
     '''
-
-    def on_results(self, results):
-        getter = ResultGetter(
-            results,
-            fields=['first_name', 'name', 'pic_square', 'sex'],
-            id_field='uid',
-            extra_fields={'name_uppercase': lambda x: x['name'].upper()}
-        )
-        return getter
+    result_class = FriendsResult
+    # Need to add the field 'name_uppercase'
 
 
-class TaggedWithMeTask(FQLTask):
+class TagWithMeResult(ResourceResult):
+    subject = IntegerField(required=True)
+    photo_id = IntegerField(required=True)
+    created = TimestampField()     # 2/20: sometimes the `created` field comes back None
+
+
+class TaggedWithMeResource(FqlResource):
     """
     Returns all of the tags of all photos I am in
-    We do this because we can't pull `tags`
-    from the `photo` table.
+    We do this because we can't pull `tags` from `photo` table.
     --> This is a workaround for the fact that
         facebook WHERE queries are broken for `photo_tags`
     """
     fql = '''
         SELECT subject, object_id, created FROM photo_tag WHERE object_id IN
             (SELECT object_id FROM photo_tag WHERE subject=me())
-        AND subject!=me() AND created < %s ORDER BY created DESC
-    ''' % UNIX_THIS_YEAR_END
+        AND subject!=me() %s ORDER BY created DESC
+    '''
 
-    def on_results(self, results):
-        """
-        Build a list of user ids that are tagged with
-        the current user
-        """
-        # We *don't* want to collapse on the object_id field here
-        # 2/20: sometimes the `created` field comes back None
-        getter = ResultGetter(
-            results,
-            auto_id_field=True,
-            fields=['subject', 'created'],
-            # integer_fields=['object_id', 'subject'],
-            timestamps=['created'],
-            defaults={'created': datetime.datetime(2012 - 2, 1, 1, tzinfo=utc)},
-            )
-        return getter
+    def run(self, end_datetime=None):
+        # If end_datetime is specified, append to `fql`
+        if end_datetime:
+            unix_end_time = self._convert_datetime_to_timestamp(end_datetime)
+            self.fql %= 'AND created < %s ' % unix_end_time
+        else:
+            self.fql %= ''
+
+        super(TaggedWithMeResource, self).run()
+
+    # specify a default value for `created`

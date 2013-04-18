@@ -1,5 +1,5 @@
 The `FacebookConnector` class holds a collection of `Resources`. 
-* A `Resource` encapsulates a particular calls we can make to the FB server, for instance `ProfileFieldsResource` 
+* A `Resource` encapsulates a particular call we can make to the FB server, for instance `ProfileFieldsResource`
 returns a subset of the fields from a user's profile. 
 
 `ProfileFieldsResource` is a subclass of `FqlResource`, which contains the general logic for making a generic FQL query. 

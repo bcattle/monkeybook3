@@ -1,47 +1,70 @@
-from monkeybook.fql.base import FQLTask
-from monkeybook.fql.getter import ResultGetter, process_photo_results
-# TODO: remove this dependency, or move this fql into Yearbook2012
-from monkeybook.books.yearbook2012.settings import *
+from monkeybook.facebook_connector.resources import FqlResource
+from monkeybook.facebook_connector.results import ResourceResult, ResultField, IntegerField, TimestampField
 
 
-class PhotosOfMeTask(FQLTask):
+class PhotosOfMeResult(ResourceResult):
+    object_id = IntegerField()
+    images = ResultField()
+    created = TimestampField()
+    comment_info = ResultField()
+    like_info = ResultField()
+    album_object_id = IntegerField()
+    caption = ResultField()
+
+
+class PhotosOfMeTask(FqlResource):
     """
     Returns all of the photos the current user is tagged in.
     """
     fql = '''
-        SELECT %s, album_object_id, caption FROM photo
-            WHERE created < %s
-            AND object_id IN
+        SELECT object_id, images, created, comment_info, like_info,
+            album_object_id, caption FROM photo
+            WHERE object_id IN
                 (SELECT object_id FROM photo_tag WHERE subject=me())
-    ''' % (PHOTO_FIELDS, UNIX_THIS_YEAR_END)
+            %s
+    '''
+    result_class = PhotosOfMeResult
 
-    def on_results(self, results):
-        getter = process_photo_results(
-            results,
-            add_to_fields=['album_object_id', 'caption'],
-            add_to_defaults={'caption': ''},
-            commit=False,
-        )
-        return getter
+    def run(self, end_datetime=None):
+        # If end_datetime is specified, append to `fql`
+        if end_datetime:
+            unix_end_time = self._convert_datetime_to_timestamp(end_datetime)
+            self.fql %= 'AND created < %s ' % unix_end_time
+        else:
+            self.fql %= ''
+
+        super(PhotosOfMeTask, self).run()
+
+    # Run process_photo_results
 
 
-class CommentsOnPhotosOfMeTask(FQLTask):
+class CommentsOnPhotosOfMeResult(ResourceResult):
+    object_id = IntegerField()
+    fromid = IntegerField()
+    time = TimestampField()
+    text = ResultField()
+    likes = IntegerField()
+    user_likes = ResultField()
+
+
+class CommentsOnPhotosOfMeResource(FqlResource):
     """
     Returns all comments on the photos the current user is tagged in
     """
     fql = '''
         SELECT object_id, fromid, time, text, likes, user_likes
-            FROM comment WHERE time < %s
-            AND object_id IN
+            FROM comment WHERE object_id IN
                 (SELECT object_id FROM photo_tag WHERE subject=me())
-    ''' % UNIX_THIS_YEAR_END
+            %s
+    '''
+    result_class = CommentsOnPhotosOfMeResult
 
-    def on_results(self, results):
-        getter = ResultGetter(
-            results,
-            auto_id_field=True,
-            fields=['object_id', 'fromid', 'time', 'text', 'likes', 'user_likes'],
-            integer_fields=['object_id', 'fromid', 'likes'],
-            timestamps=['time'],
-        )
-        return getter
+    def run(self, end_datetime=None):
+        # If end_datetime is specified, append to `fql`
+        if end_datetime:
+            unix_end_time = self._convert_datetime_to_timestamp(end_datetime)
+            self.fql %= 'AND time < %s ' % unix_end_time
+        else:
+            self.fql %= ''
+
+        super(CommentsOnPhotosOfMeResource, self).run()

@@ -1,3 +1,5 @@
 ipython
 ipdb
 yolk
+pylint
+raven

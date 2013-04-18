@@ -1,9 +1,9 @@
 from monkeybook.facebook_connector.resources import FqlResource
-from monkeybook.facebook_connector.results import ResourceResult, ResultField
+from monkeybook.facebook_connector.results import ResourceResult, ResultField, IntegerField
 
 
 class ProfileFieldsResult(ResourceResult):
-    uid = ResultField(required=True)
+    uid = IntegerField(required=True)
     username = ResultField(required=True)
     email = ResultField()
     locale = ResultField()
@@ -15,7 +15,7 @@ class ProfileFieldsResult(ResourceResult):
     pic_square = ResultField()
     relationship_status = ResultField()
     sex = ResultField()
-    significant_other_id = ResultField()
+    significant_other_id = IntegerField()
 
 
 class ProfileFieldsResource(FqlResource):
@@ -28,31 +28,24 @@ class ProfileFieldsResource(FqlResource):
     result_class = ProfileFieldsResult
 
 
+class FamilyResult(ResourceResult):
+    uid = IntegerField()
+    relationship = ResultField()
 
-# class FamilyTask(FQLTask):
-#     fql = '''
-#         SELECT uid, relationship FROM family WHERE profile_id = me()
-#     '''
-#
-#     def on_results(self, results):
-#         return results
-#
-#     def save(self, results):
-#         # Overwrites the existing list
-#         self.user.family = [FamilyMember(id=str(f['uid']), relationship=f['relationship'])
-#                             for f in results]
-#         self.user.save()
-#
-#
-# class SquareProfilePicTask(FQLTask):
-#     fql = '''
-#         SELECT url,real_size FROM square_profile_pic WHERE id = me() AND size = 160
-#     '''
-#
-#     def on_results(self, results):
-#         return results[0]
-#
-#     def save(self, results):
-#         self.user.pic_square_large = results['url']
-#         self.user.save()
-#
+
+class FamilyResource(FqlResource):
+    fql = '''
+        SELECT uid, relationship FROM family WHERE profile_id = me()
+    '''
+    result_class = FamilyResult
+
+
+class SquareProfilePicResult(ResourceResult):
+    url = ResultField()
+    real_size = ResultField()
+
+
+class SquareProfilePicResource(FqlResource):
+    fql = '''
+        SELECT url,real_size FROM square_profile_pic WHERE id = me() AND size = 160
+    '''

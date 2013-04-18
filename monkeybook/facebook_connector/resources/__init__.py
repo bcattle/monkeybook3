@@ -1,8 +1,12 @@
+import calendar
 from monkeybook.facebook_connector.results import ResultsCollection
 from monkeybook.facebook_connector.tasks import FqlTask
 
 
 class FqlResource(object):
+    fql = None
+    result_class = None
+
     def __init__(self, access_token, storage=None):
         assert self.fql
         assert self.result_class
@@ -12,7 +16,7 @@ class FqlResource(object):
     def run(self):
         """
         Runs an FQLTask with the specified query
-        pass thorugh the instance of `storage`
+         - pass through the instance of `storage`
         """
         task = FqlTask(self.fql, self.access_token, self.storage)
 
@@ -26,4 +30,5 @@ class FqlResource(object):
 
         return results_collection
 
-
+    def _convert_datetime_to_timestamp(self, dt):
+        return calendar.timegm(dt.utctimetuple())

@@ -18,6 +18,7 @@ class MongoQueryStorage(ResultStorage):
     """
     def __init__(self, user_id):
         self.user_id = user_id
+        super(MongoQueryStorage, self).__init__()
 
     def store(self, query_type, query, results):
         """

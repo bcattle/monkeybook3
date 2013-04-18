@@ -1,47 +1,43 @@
-from monkeybook.fql.base import FQLTask
-from monkeybook.fql.getter import ResultGetter
-# TODO: remove this dependency, or move this fql into Yearbook2012
-from monkeybook.books.yearbook2012.settings import *
+from monkeybook.facebook_connector.resources import FqlResource
+from monkeybook.facebook_connector.results import ResourceResult, ResultField, IntegerField, TimestampField
 
 
-class OwnerPostsFromYearTask(FQLTask):
+class PostsResult(ResourceResult):
+    post_id = IntegerField()
+    actor_id = IntegerField()
+    created_time = TimestampField()
+    comments = ResultField()
+    likes  = ResultField()
+    message = ResultField()
+
+
+class OwnerPostsFromYearTask(FqlResource):
     fql = '''
         SELECT post_id, actor_id, created_time, comments, likes, message FROM stream
             WHERE source_id=me() AND message!='' AND filter_key='owner'
-            AND created_time > %s AND created_time < %s LIMIT 500
-    ''' % (UNIX_THIS_YEAR, UNIX_THIS_YEAR_END)
+            %s LIMIT 500
+    '''
+    result_class = PostsResult
 
-    def on_results(self, results):
-        getter = ResultGetter(
-            results,
-            id_field='post_id',
-            id_is_int=False,
-            fields=['actor_id', 'created_time', 'comments', 'comments.count',
-                    'likes.count', 'message'],
-            field_names={'comments.count': 'comment_count', 'likes.count': 'like_count'},
-            defaults={'comments.count': 0, 'likes.count':0 },
-            timestamps=['created_time']
-        )
-        return getter
+    def run(self, start_datetime=None, end_datetime=None):
+        # If start/end specified, append to `fql`
+        extra_fql = ''
+        if start_datetime:
+            unix_end_time = self._convert_datetime_to_timestamp(start_datetime)
+            extra_fql += ' AND created > %s' % unix_end_time
+        if end_datetime:
+            unix_end_time = self._convert_datetime_to_timestamp(end_datetime)
+            extra_fql += ' AND created < %s' % unix_end_time
+        self.fql %= extra_fql
+
+        super(OwnerPostsFromYearTask, self).run()
+
+    # Set default values for comments.count and likes.count
 
 
 class OthersPostsFromYearTask(OwnerPostsFromYearTask):
     fql = '''
         SELECT post_id, actor_id, created_time, comments, likes, message FROM stream
             WHERE source_id=me() AND message!='' AND filter_key='others'
-            AND created_time > %s AND created_time < %s LIMIT 500
-    ''' % (UNIX_THIS_YEAR, UNIX_THIS_YEAR_END)
-
-
-#class GetPostTask(FQLTask):
-#    def __init__(self, post_ids, name=None):
-#        self.fql = ['''
-#            SELECT message, comments, likes, created_time, place, attachment
-#                FROM stream WHERE post_id = '%s'
-#        ''' % post_id for post_id in post_ids]
-#        super(GetPostTask, self).__init__(name)
-#
-#    def on_results(self, results):
-#        # This one requires looping through to get the comments (and likes for that matter)
-#        # Just return the JSON
-#        return results
+            %s LIMIT 500
+    '''
