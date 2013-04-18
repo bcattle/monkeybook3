@@ -1,0 +1,4 @@
+
+
+class FacebookConnector(object):
+    pass
