@@ -49,3 +49,4 @@ class SquareProfilePicResource(FqlResource):
     fql = '''
         SELECT url,real_size FROM square_profile_pic WHERE id = me() AND size = 160
     '''
+    result_class = SquareProfilePicResult

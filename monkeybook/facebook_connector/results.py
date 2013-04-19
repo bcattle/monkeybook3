@@ -40,17 +40,19 @@ class ResourceResult(object):
 
         # Assign the incoming dict to fields
         for result_name, result_val in result.items():
-            if result_name in fields:
+            if result_name in fields \
+                and result_val is not None and result_val != '':
                 field = fields[result_name]
                 setattr(self, result_name, field.to_python(result_val))
                 fields.pop(result_name)
 
         # Raise an error if an unused field is `required`
-        for field in fields:
+        for name, field in fields.items():
             if field.required:
-                raise BlankFieldError('Field %s is required' % field.orig_name)
+                raise BlankFieldError('Field %s is required. Result was "%s"' % (name, result))
+            else:
+                setattr(self, name, None)
 
 
 class ResultsCollection(list):
     pass
-

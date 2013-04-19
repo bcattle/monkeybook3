@@ -7,18 +7,22 @@ class FqlResource(object):
     fql = None
     result_class = None
 
+
     def __init__(self, access_token, storage=None):
         assert self.fql
         assert self.result_class
         self.access_token = access_token
         self.storage = storage
 
-    def run(self):
+
+    def run(self, fql=None):
         """
         Runs an FQLTask with the specified query
          - pass through the instance of `storage`
         """
-        task = FqlTask(self.fql, self.access_token, self.storage)
+        if fql is None:
+            fql = self.fql
+        task = FqlTask(fql, self.access_token, self.storage)
 
         # Get the results
         results = task.get_results()
@@ -29,6 +33,7 @@ class FqlResource(object):
             results_collection.append(self.result_class(result))
 
         return results_collection
+
 
     def _convert_datetime_to_timestamp(self, dt):
         return calendar.timegm(dt.utctimetuple())
