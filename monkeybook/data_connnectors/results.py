@@ -1,4 +1,4 @@
-import datetime, collections
+import datetime, collections, copy
 from pytz import utc
 
 
@@ -31,13 +31,17 @@ class TimestampField(ResultField):
 
 
 class ResourceResult(object):
-    def __init__(self, result):
-        # Find all fields
+    _fields = None
+
+    def _get_fields(self):
         fields = {}
         for name, attr in self.__class__.__dict__.items():
             if isinstance(attr, ResultField):
                 fields[name] = attr
+        return fields
 
+
+    def _assign_values(self, fields, result):
         # Assign the incoming dict to fields
         for result_name, result_val in result.items():
             if result_name in fields \
@@ -46,28 +50,52 @@ class ResourceResult(object):
                 setattr(self, result_name, field.to_python(result_val))
                 fields.pop(result_name)
 
-        # Raise an error if an unused field is `required`
-        for name, field in fields.items():
+
+    def _check_required_fields(self, err_data=None):
+        err_data = err_data or ''
+        for name, field in self._fields.items():
             if field.required:
-                raise BlankFieldError('Field %s is required. Result was "%s"' % (name, result))
+                raise BlankFieldError('Field %s is required. Input was "%s"' % (name, err_data))
             else:
                 setattr(self, name, None)
+
+
+    def __init__(self, result=None, base=None, **kwargs):
+        """
+        Builds a ResourceResult.
+        `result` is a dict of fields, e.g. in from fb
+
+        This can also take an existing ResourceResult and
+        extend it by adding additional fields.
+
+        `kwargs` are the values of the new fields
+        """
+        # Find all fields
+        self._fields = self._get_fields()
+        fields = copy.copy(self._fields)
+
+        # Assign the fields from the base instance, if any
+        if base:
+            for field in base._fields:
+                setattr(self, field, getattr(base, field, None))
+
+        # Assign fields defined in this class
+        if result:
+            self._assign_values(fields, result)
+        self._assign_values(fields, kwargs)
+
+        # Raise an error if an unused field is `required`
+        self._check_required_fields()
 
 
 class ResultsCollection(list):
     _field_indices = {}
 
-    def get_by_field(self, field_name, value, unique_key=True):
+    def get_by_field(self, field_name, value):
         """
         Allows the collection to be indexed by any
         of its fields, returns all values that match.
         Mappings are created lazily
-
-        If `unique_key` is True, it is assumed that all values
-        in the collection have a unique value of the field
-
-        If False, the collection is searched for multiple matching
-        values of the field in question (slower)
         """
         if not len(self):
             raise IndexError('get_by_field() called before the collection has any values')
@@ -75,15 +103,9 @@ class ResultsCollection(list):
         assert hasattr(self[0], field_name)
 
         if field_name not in self._field_indices:
-            if unique_key:
-                self._field_indices[field_name] = {
-                    getattr(item, field_name): item
-                    for item in self
-                }
-            else:
-                self._field_indices[field_name] = collections.defaultdict(list)
-                for element in self:
-                    key = getattr(element, field_name)
-                    self._field_indices[field_name][key].append(element)
+            self._field_indices[field_name] = collections.defaultdict(list)
+            for element in self:
+                key = getattr(element, field_name)
+                self._field_indices[field_name][key].append(element)
 
         return self._field_indices[field_name][value]

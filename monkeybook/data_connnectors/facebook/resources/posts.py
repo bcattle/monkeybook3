@@ -1,5 +1,5 @@
-from monkeybook.facebook_connector.resources import FqlResource
-from monkeybook.facebook_connector.results import ResourceResult, ResultField, IntegerField, TimestampField
+from monkeybook.data_connnectors.facebook.resources import FqlResource
+from monkeybook.data_connnectors.results import ResourceResult, ResultField, IntegerField, TimestampField
 
 
 class PostsResult(ResourceResult):
