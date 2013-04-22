@@ -1,5 +1,4 @@
-import ipdb
-from monkeybook.generators.signals.signal import Signal
+from monkeybook.generators.signals import Signal
 from monkeybook.generators.page_gens.page_gen import PageGen
 
 class BookGeneratorConfig(object):
@@ -19,11 +18,11 @@ class BookGenerator(object):
   # Global registries for signals and page_gens
   signal_registry = {}
   page_gen_registry = {}
+
   def __init__(self, config):
     print 'initializing book generator w/ config ' + str(config)
     self.config = config
-    
-  
+
   def generate_book(self, data):
     print 'generating book with data ' + str(data)
     pages = []
@@ -50,6 +49,7 @@ class BookGenerator(object):
   def order_pages(self, pages):
     print 'ordering pages'
     return pages
+
 
 def main():
   print 'Starting up'

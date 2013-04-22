@@ -25,17 +25,11 @@ class RunFqlBaseTask(LoggedUserTask):
 
 @celery.task(base=RunFqlBaseTask)
 def run_fql(task_cls, user_id, commit=True, *args, **kwargs):
-    """
-    commit: do we call task.save()?
-    """
     # Make the API Call
     task = task_cls()
     # self.name = '%s:%s' % (self.name, task.name)
     user = User.objects.get(id=user_id)
     results = task.run(user)
-    if commit:
-        # Store the info
-        task.save(results[task.name])
     return results
 
 

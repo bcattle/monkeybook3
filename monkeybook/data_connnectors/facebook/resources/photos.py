@@ -1,10 +1,10 @@
-from monkeybook.facebook_connector.resources import FqlResource
-from monkeybook.facebook_connector.results import ResourceResult, ResultField, IntegerField, TimestampField
+from monkeybook.data_connnectors.facebook.resources import FqlResource
+from monkeybook.data_connnectors.results import ResourceResult, ResultField, IntegerField, TimestampField
 
 
 class TaggedWithMeResult(ResourceResult):
-    subject = IntegerField()       # sometimes comes back empty
     object_id = IntegerField(required=True)
+    subject = IntegerField()       # sometimes comes back empty
     created = TimestampField()     # 2/20: sometimes the `created` field comes back None
 
 
@@ -47,7 +47,7 @@ class PhotosOfMeResult(ResourceResult):
     caption = ResultField()
 
 
-class PhotosOfMeTask(FqlResource):
+class PhotosOfMeResource(FqlResource):
     """
     Returns all of the photos the current user is tagged in.
     """
@@ -69,7 +69,7 @@ class PhotosOfMeTask(FqlResource):
         else:
             fql %= ''
 
-        return super(PhotosOfMeTask, self).run(fql)
+        return super(PhotosOfMeResource, self).run(fql)
 
     # Run process_photo_results
 
