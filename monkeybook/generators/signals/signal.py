@@ -3,7 +3,7 @@ class Signal(object):
 
   @staticmethod
   def create(name, *args, **kwargs):
-    return Signal.registry[name](args, kwargs)
+    return Signal.registry[name](*args, **kwargs)
 
   @classmethod
   def register(cls):

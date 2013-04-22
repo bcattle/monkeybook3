@@ -2,7 +2,7 @@ from mongoengine import *
 
 # Represents any text blocks, with alternate text blocks.
 
-class Text(Document):
+class PageText(Document):
   def __init__(self):
     return
   # Example of style could be 'FacebookComment', and the frontend/template would
@@ -11,15 +11,5 @@ class Text(Document):
   
   text = StringField()
 
-  width = IntegerField()
-  height = IntegerField()
-
-  photos = ListField(ReferenceField(Photo))
-  text = ListField(ReferenceField(PageText))
-
-  @property    
-  def width():
-    return book.width
-
-  def height():
-    return book.height
+  width = IntField()
+  height = IntField()

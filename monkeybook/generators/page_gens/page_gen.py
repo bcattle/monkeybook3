@@ -19,3 +19,4 @@ class PageGen(object):
   	
 # Import all the page_gens here, theyll be automatically added to the registry.
 import monkeybook.generators.page_gens.simple_page_gen
+import monkeybook.generators.page_gens.static_page_gen
