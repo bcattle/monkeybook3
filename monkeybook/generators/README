@@ -1,0 +1,70 @@
+Book Config:
+
+Defines the attributes of the book, the signal_generators, and page_generators.
+The page_generators can have parameters (like background)
+
+ex:
+yearbook.config
+width=100 height=100 target_pages = 25, max_pages = 50
+page_generators = static(1, front_img), static(-1, back_img), album_page(3, background, priority), photos(10, background)
+signals = top_photos, comment_sentiment, top_albums, friends_ranking
+
+BookGenerator:
+from signal_generators import *
+from page_generators import *
+page_generators = [] # global registry of all page generators, maps 'PageGenName' to ClassName
+signal_generators = []
+GenerateBook(data, config)
+    # Loads configs, loads pagegens and signals, verifies all requirements are met
+    signals_gens, page_gens, book = InitBook(config) 
+    
+    # Preprocess all data and add signals
+    for signal in signal_gens:
+        signal.process(data)
+    
+    pages = []
+    for page_gen in page_gens:
+        pages.append(page_gen.generate(data))
+        
+    # order pages based on priority, max/target_pagecount, index, relative_index
+    OrderPages(pages)
+    
+    #post proccess, do things like add additional photos/comments
+    for page_gen in page_gens:
+        page_gen.Finalize(pages)
+        
+    WriteBook(pages)
+    
+(Simple)SignalGenerator:
+    name='simple'
+    BookGenerator.signal_generators.append((name, SimpleSignalGenerator))
+    
+    #args passed by config
+    def __init__(*args, **kwargs):
+    
+    # Processes the data for signals
+    def Process(data):
+    
+    # list of other signals or page_gens needed. May depend on init
+    def Requirements()
+    
+(Simple)Page:
+    name='simplepage'
+    BookGenerator.page_generators.append((name, SimplePageGenerator))
+    
+    #args passed by config
+    def __init__(*args, **kwargs):
+    
+    # Processes the data + signals and spit out pages. Each page has either
+    # page_index or relative_index as well as priority
+    def GeneratePages(data):
+    
+    
+    # Post proccess pages
+    def FinalizePages(pages, data):
+    
+    # list of other signals or page_gens needed. May depend on init
+    def Requirements()
+    
+    
+    

@@ -17,14 +17,6 @@ class Page(Document):
   photos = ListField(ReferenceField(Photo))
   text = ListField(ReferenceField(PageText))
 
-  # Hints for ordering the book. A page can specify an absolute page index, a 
-  # a relative page index (0..1) or a next/previous page. The book orderer takes
-  # previous/next page, page_index, relative_index into account in that order.
-  page_index = IntegerField()
-  relative_index = FloatField()
-  previous_page = ReferenceField(Page)
-  next_page = ReferenceField(Page)
-
   @property    
   def width():
     return book.width
