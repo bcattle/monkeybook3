@@ -44,11 +44,13 @@ class ResourceResult(object):
     def _assign_values(self, fields, result):
         # Assign the incoming dict to fields
         for result_name, result_val in result.items():
-            if result_name in fields \
-                and result_val is not None and result_val != '':
-                field = fields[result_name]
-                setattr(self, result_name, field.to_python(result_val))
-                fields.pop(result_name)
+            if result_name in fields:
+                if result_val is not None and result_val != '':
+                    field = fields[result_name]
+                    setattr(self, result_name, field.to_python(result_val))
+                    fields.pop(result_name)
+            else:
+                raise AttributeError('Attempted to set value of field %s not defined in class' % result_name)
 
 
     def _check_required_fields(self, err_data=None):
@@ -91,6 +93,21 @@ class ResourceResult(object):
 class ResultsCollection(list):
     _field_indices = {}
 
+    def _make_mapping_by_field(self, field_name):
+        self._field_indices[field_name] = collections.defaultdict(list)
+        for element in self:
+            key = getattr(element, field_name)
+            self._field_indices[field_name][key].append(element)
+
+
+    def _scalar(self, field_name):
+        """
+        Returns a set of all values of one field
+        """
+        values = [getattr(result, field_name) for result in self]
+        return values
+
+
     def get_by_field(self, field_name, value):
         """
         Allows the collection to be indexed by any
@@ -103,9 +120,20 @@ class ResultsCollection(list):
         assert hasattr(self[0], field_name)
 
         if field_name not in self._field_indices:
-            self._field_indices[field_name] = collections.defaultdict(list)
-            for element in self:
-                key = getattr(element, field_name)
-                self._field_indices[field_name][key].append(element)
+            self._make_mapping_by_field(field_name)
 
         return self._field_indices[field_name][value]
+
+
+    def merge_no_duplicates(self, id_field, new_results):
+        """
+        Merges into this list,
+        discarding any that are duplicate
+        by keying on the specified field
+        """
+        keys = set(self._scalar(id_field))
+        for result in new_results:
+            if getattr(result, id_field) not in keys:
+                self.append(result)
+        # Cache invalidation
+        self._field_indices = {}

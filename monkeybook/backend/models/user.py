@@ -17,7 +17,7 @@ class FamilyMember(EmbeddedDocument):
 
 
 class User(Document, UserMixin):
-    id = StringField(unique=True, max_length=FB_ID_FIELD_LENGTH, primary_key=True)
+    uid = StringField(unique=True, max_length=FB_ID_FIELD_LENGTH, primary_key=True)
     username = StringField(max_length=255)
     email = EmailField(max_length=255)
     active = BooleanField(default=True)     # TODO: need to check that user is `active`
