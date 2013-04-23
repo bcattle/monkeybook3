@@ -30,6 +30,21 @@ class Page(Document):
   relative_index = FloatField()
   previous_page = ReferenceField('Page')
   next_page = ReferenceField('Page')
+  
+  def __init__(self, width, height, page_index=None, relative_index=None,
+               previous_page=None, next_page=None):
+    self.width = width
+    self.height = height
+    if page_index != None:
+      self.page_index = page_index
+    if relative_index != None:
+      self.relative_index = relative_index
+    if previous_page != None:
+      self.previous_page = previous_page
+    if self.next_page != None:
+      self.next_page = next_page
 
-  def add_photo():
-    return
+  def add_image(self, width, height, pos_x, pos_y):
+    img = Image(width, height, pos_x, pos_y)
+    images.append(img)
+    return img
