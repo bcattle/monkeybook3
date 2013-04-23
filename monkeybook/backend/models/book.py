@@ -2,7 +2,7 @@ from mongoengine import *
 
 class Book(Document):
   def __init__(self):
-    return
+    super(Book, self).__init__()
 
 # Initial version of the 'dumb' book. The only thing in the model is information
 # that is needed to edit and display the book. Additional information, such as

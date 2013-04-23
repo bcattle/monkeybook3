@@ -1,39 +1,44 @@
 from mongoengine import *
+from monkeybook.backend.models.text import PageText
 
 # A contains information about an image to display in the photobook.
-# It has all the resolutions of the image, any alternate photos, and possibly
-# any associated comments. 
-class Photo(Document):
-  def __init__(self):
-    return
-
-  style = StringField()
+class Image(EmbeddedDocument):
+  # The width and height on the page
+  width = IntField()
+  height = IntField()
+  pos_x = IntField()
+  pos_y = IntField()
+  primary_photo = ReferenceField('Photo')
+  alternate_photos = ListField(ReferenceField('Photo'))
   
-  width = IntegerField()
-  height = IntegerField()
+  
+  def __init__(self, width, height, pos_x, pos_y):
+    super(Image, self).__init__()
+    self.width = width
+    self.height = height
+    self.pos_x = pos_x
+    self.pos_y = pos_y
+  
+class Photo(Document):
+  def __init__(self, url, width=0, height=0):
+    super(Photo, self).__init__()
+    self.add_url(url, width, height)
+  # style = StringField()
+  
+  # The actual resolution of the photo
+  text = ListField(ReferenceField(PageText))
+  urls = ListField(EmbeddedDocumentField('PhotoUrl'))
+  
+  def add_url(self, url, width=0, height=0):
+    self.urls.append(PhotoUrl(url, width, height))    
 
-  pos_x = IntegerField()
-  pos_y = IntegerField()
-
-  text = ListField(ReferenceField(Text))
-  images = ListField(ReferenceField(Image))
-  alt_photos = ListField(ReferenceField(Photo))
-
-  @property    
-  def width():
-    return book.width
-
-  @property
-  def height():
-    return book.height
-
-  @property
-  def image():
-    # return the largest image
-    return
-
-class Image(EmbededDocument):
+class PhotoUrl(EmbeddedDocument):
   url = StringField()
-  # The native width/height of the image, not the width height on the page.
-  width = IntegerField()
-  height = IntegerField()
+  width = IntField()
+  height = IntField()
+  def __init__(self, url, width, height):
+    super(PhotoUrl, self).__init__()
+    self.width = width
+    self.height = height
+    self.url = url
+    

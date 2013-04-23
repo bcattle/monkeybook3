@@ -8,11 +8,11 @@ class BookGenerator(object):
   # Global registries for signals and page_gens
   signal_registry = {}
   page_gen_registry = {}
-
   def __init__(self, config):
     print 'initializing book generator w/ config ' + str(config)
     self.config = config
-
+    
+  
   def generate_book(self, data):
     print 'generating book with data ' + str(data)
     pages = []
@@ -40,15 +40,16 @@ class BookGenerator(object):
     print 'ordering pages'
     return pages
 
-
 def main():
   print 'Starting up'
-
+  
   simple_config = BookGeneratorConfig()
   simple_config.signals.append(Signal.create('SimpleSignal', 1, 2, 3))
   simple_config.signals.append(Signal.create('SimpleSignal', 4, 5, 6))
   simple_config.signals.append(Signal.create('SimpleSignal', 7, 8, 9, foo='bar'))
 
+  simple_config.page_gens.append(PageGen.create('StaticPageGen', 1, width=100, 
+                                                height=100, img='static_img.jpg'))
   simple_config.page_gens.append(PageGen.create('SimplePageGen', 1, 2))
   simple_config.page_gens.append(PageGen.create('SimplePageGen', 3, 4, foo2='bar2'))
 
