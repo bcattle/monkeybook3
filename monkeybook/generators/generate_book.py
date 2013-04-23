@@ -1,5 +1,5 @@
 import ipdb
-from monkeybook.generators.signals.signal import Signal
+from monkeybook.generators.signals import Signal
 from monkeybook.generators.page_gens.page_gen import PageGen
 
 class BookGeneratorConfig(object):

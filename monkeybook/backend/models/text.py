@@ -4,6 +4,7 @@ from mongoengine import *
 
 class PageText(Document):
   def __init__(self):
+    super(PageText, self).__init__()
     return
   # Example of style could be 'FacebookComment', and the frontend/template would
   # have a FacebookComment strategy or template.

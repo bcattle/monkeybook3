@@ -13,6 +13,7 @@ class Image(EmbeddedDocument):
   
   
   def __init__(self, width, height, pos_x, pos_y):
+    super(Image, self).__init__()
     self.width = width
     self.height = height
     self.pos_x = pos_x
@@ -20,6 +21,7 @@ class Image(EmbeddedDocument):
   
 class Photo(Document):
   def __init__(self, url, width=0, height=0):
+    super(Photo, self).__init__()
     self.add_url(url, width, height)
   # style = StringField()
   
@@ -35,6 +37,7 @@ class PhotoUrl(EmbeddedDocument):
   width = IntField()
   height = IntField()
   def __init__(self, url, width, height):
+    super(PhotoUrl, self).__init__()
     self.width = width
     self.height = height
     self.url = url

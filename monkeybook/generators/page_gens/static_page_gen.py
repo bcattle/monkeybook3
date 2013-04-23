@@ -1,6 +1,7 @@
 from monkeybook.generators.page_gens.page_gen import PageGen
 from monkeybook.backend.models.page import Page
-from monkeybook.backend.models.image import Image
+from monkeybook.backend.models.photo import Image
+from monkeybook.backend.models.photo import Photo
 
 class StaticPageGen(PageGen):
   def __init__(self, *args, **kwargs):
@@ -17,9 +18,9 @@ class StaticPageGen(PageGen):
             str(self.args) + 'str kwargs ' + str(self.kwargs) + 'width ' + str(self.width))
     
     page = Page(self.width, self.height, page_index=self.page_index)
-    img = page.add_image(self.width-20, self,height-20, 10, 10)
+    img = page.add_image(self.width-20, self.height-20, 10, 10)
     img.primary_photo = Photo(self.background_image)
-    print page
+    print str(page)
     return [page]
     
   def finalize(self, pages, data):

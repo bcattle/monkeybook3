@@ -33,6 +33,7 @@ class Page(Document):
   
   def __init__(self, width, height, page_index=None, relative_index=None,
                previous_page=None, next_page=None):
+    super(Page, self).__init__()
     self.width = width
     self.height = height
     if page_index != None:
@@ -46,5 +47,5 @@ class Page(Document):
 
   def add_image(self, width, height, pos_x, pos_y):
     img = Image(width, height, pos_x, pos_y)
-    images.append(img)
+    self.images.append(img)
     return img
