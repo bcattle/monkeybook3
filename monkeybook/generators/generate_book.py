@@ -1,17 +1,7 @@
+from monkeybook.generators.schoolyearbook2013.config import BookGeneratorConfig
+from monkeybook.generators.schoolyearbook2013.source_data import SchoolYearbook2013SourceData
 from monkeybook.generators.signals import Signal
 from monkeybook.generators.page_gens.page_gen import PageGen
-
-class BookGeneratorConfig(object):
-  def __init__(self):
-    # Ideally this should be built from some sort of config file
-    self.signals = []
-    self.page_gens = []
-    self.width = 1000
-    self.height = 1000
-
-    # I'm ignoring tracking odd and even pages for now.
-    self.target_pages = 50
-    self.max_pages = 75
 
 
 class BookGenerator(object):
@@ -63,7 +53,11 @@ def main():
   simple_config.page_gens.append(PageGen.create('SimplePageGen', 3, 4, foo2='bar2'))
 
   gen = BookGenerator(simple_config)
-  gen.generate_book([])
+
+  data = SchoolYearbook2013SourceData(simple_config)
+  data.collect_data()
+
+  gen.generate_book(data)
 
 if __name__ == '__main__':
   main()
