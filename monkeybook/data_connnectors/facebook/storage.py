@@ -1,15 +1,6 @@
-from .mongodb import FqlResult
-
-
-class ResultStorage(object):
-    def __init__(self):
-        pass
-
-    def store(self, query_type, query, results):
-        raise NotImplementedError
-
-    def retrieve(self, query):
-        raise NotImplementedError
+import datetime
+from monkeybook.data_connnectors.storage import ResultStorage
+from mongoengine import *
 
 
 class MongoQueryStorage(ResultStorage):
@@ -35,3 +26,19 @@ class MongoQueryStorage(ResultStorage):
     def retrieve(self, query):
         return FqlResult.objects.first(user_id=self.user_id, query=query).results
 
+
+class FqlResult(Document):
+    """
+    Holds the results of an individual FQL query
+    run for a user
+    """
+    user_id = StringField(max_length=30, required=True)
+    created = DateTimeField(default=lambda: datetime.datetime.utcnow())
+    query_type = StringField(max_length=20, required=True)
+    query = StringField(max_length=1000, required=True)
+    results = DynamicField(required=True)
+
+    meta = {
+        'indexes': ['user_id', ('user_id', 'query_type'), ('user_id', 'query')],
+        'ordering': ['user_id', 'query', '-created']
+    }

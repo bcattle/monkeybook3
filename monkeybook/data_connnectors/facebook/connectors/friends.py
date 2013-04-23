@@ -1,8 +1,8 @@
-from monkeybook.data_connnectors.facebook.resources import FqlResource
-from monkeybook.data_connnectors.results import ResourceResult, ResultField, IntegerField
+from monkeybook.data_connnectors.facebook.connectors import FqlConnector
+from monkeybook.data_connnectors.results import ConnectorResult, ResultField, IntegerField
 
 
-class FriendsResult(ResourceResult):
+class FriendsResult(ConnectorResult):
     uid = IntegerField(required=True)
     name = ResultField(required=True)
     first_name = ResultField()
@@ -10,7 +10,7 @@ class FriendsResult(ResourceResult):
     sex = ResultField()
 
 
-class FriendsResource(FqlResource):
+class FriendsConnector(FqlConnector):
     """
     Pulls all of the user's friends
     """

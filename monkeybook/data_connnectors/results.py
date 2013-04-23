@@ -7,13 +7,12 @@ class BlankFieldError(Exception):
 
 
 class ResultField(object):
-    val = None
-
     def __init__(self, required=False):
         """
         If a `required` field is not recieved from facebook,
         we raise an exception
         """
+        self.val = None
         self.required = required
 
     def to_python(self, value):
@@ -30,9 +29,7 @@ class TimestampField(ResultField):
         return datetime.datetime.utcfromtimestamp(float(value)).replace(tzinfo=utc)
 
 
-class ResourceResult(object):
-    _fields = None
-
+class ConnectorResult(object):
     def _get_fields(self):
         fields = {}
         for name, attr in self.__class__.__dict__.items():
@@ -53,9 +50,9 @@ class ResourceResult(object):
                 raise AttributeError('Attempted to set value of field %s not defined in class' % result_name)
 
 
-    def _check_required_fields(self, err_data=None):
+    def _check_required_fields(self, fields, err_data=None):
         err_data = err_data or ''
-        for name, field in self._fields.items():
+        for name, field in fields.items():
             if field.required:
                 raise BlankFieldError('Field %s is required. Input was "%s"' % (name, err_data))
             else:
@@ -64,10 +61,10 @@ class ResourceResult(object):
 
     def __init__(self, result=None, base=None, **kwargs):
         """
-        Builds a ResourceResult.
+        Builds a ConnectorResult.
         `result` is a dict of fields, e.g. in from fb
 
-        This can also take an existing ResourceResult and
+        This can also take an existing ConnectorResult and
         extend it by adding additional fields.
 
         `kwargs` are the values of the new fields
@@ -87,11 +84,14 @@ class ResourceResult(object):
         self._assign_values(fields, kwargs)
 
         # Raise an error if an unused field is `required`
-        self._check_required_fields()
+        self._check_required_fields(fields, result)
 
 
 class ResultsCollection(list):
-    _field_indices = {}
+    def __init__(self, *args, **kwargs):
+        self._field_indices = {}
+        super(ResultsCollection, self).__init__(*args, **kwargs)
+
 
     def _make_mapping_by_field(self, field_name):
         self._field_indices[field_name] = collections.defaultdict(list)

@@ -46,7 +46,7 @@ class FqlTask(BaseTask):
                 query_type=self.name,
                 query=self.fql,
                 results=fql_results,
-                )
+            )
         return fql_results
 
 

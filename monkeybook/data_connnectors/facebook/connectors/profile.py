@@ -1,8 +1,8 @@
-from monkeybook.data_connnectors.facebook.resources import FqlResource
-from monkeybook.data_connnectors.results import ResourceResult, ResultField, IntegerField
+from monkeybook.data_connnectors.facebook.connectors import FqlConnector
+from monkeybook.data_connnectors.results import ConnectorResult, ResultField, IntegerField
 
 
-class ProfileFieldsResult(ResourceResult):
+class ProfileFieldsResult(ConnectorResult):
     uid = IntegerField(required=True)
     username = ResultField(required=True)
     email = ResultField()
@@ -18,7 +18,7 @@ class ProfileFieldsResult(ResourceResult):
     significant_other_id = IntegerField()
 
 
-class ProfileFieldsResource(FqlResource):
+class ProfileFieldsConnector(FqlConnector):
     fql = '''
         SELECT uid, username, email, name, affiliations, age_range, current_location,
             first_name, pic_square, locale, relationship_status, sex,
@@ -28,24 +28,24 @@ class ProfileFieldsResource(FqlResource):
     result_class = ProfileFieldsResult
 
 
-class FamilyResult(ResourceResult):
+class FamilyResult(ConnectorResult):
     uid = IntegerField()
     relationship = ResultField()
 
 
-class FamilyResource(FqlResource):
+class FamilyConnector(FqlConnector):
     fql = '''
         SELECT uid, relationship FROM family WHERE profile_id = me()
     '''
     result_class = FamilyResult
 
 
-class SquareProfilePicResult(ResourceResult):
+class SquareProfilePicResult(ConnectorResult):
     url = ResultField()
     real_size = ResultField()
 
 
-class SquareProfilePicResource(FqlResource):
+class SquareProfilePicConnector(FqlConnector):
     fql = '''
         SELECT url,real_size FROM square_profile_pic WHERE id = me() AND size = 160
     '''

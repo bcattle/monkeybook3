@@ -1,14 +1,14 @@
-from monkeybook.data_connnectors.facebook.resources import FqlResource
-from monkeybook.data_connnectors.results import ResourceResult, ResultField, IntegerField, TimestampField
+from monkeybook.data_connnectors.facebook.connectors import FqlConnector
+from monkeybook.data_connnectors.results import ConnectorResult, ResultField, IntegerField, TimestampField
 
 
-class TaggedWithMeResult(ResourceResult):
+class TaggedWithMeResult(ConnectorResult):
     object_id = IntegerField(required=True)
     subject = IntegerField()       # sometimes comes back empty
     created = TimestampField()     # 2/20: sometimes the `created` field comes back None
 
 
-class TaggedWithMeResource(FqlResource):
+class TaggedWithMeConnector(FqlConnector):
     """
     Returns all of the tags of all photos I am in
     We do this because we can't pull `tags` from `photo` table.
@@ -22,7 +22,7 @@ class TaggedWithMeResource(FqlResource):
     '''
     result_class = TaggedWithMeResult
 
-    def run(self, end_datetime=None):
+    def run(self, access_token, storage=None, end_datetime=None):
         # If end_datetime is specified, append to `fql`
         fql = self.fql
         if end_datetime:
@@ -31,13 +31,13 @@ class TaggedWithMeResource(FqlResource):
         else:
             fql %= ''
 
-        return super(TaggedWithMeResource, self).run(fql)
+        return super(TaggedWithMeConnector, self).run(access_token, storage, fql)
 
         # specify a default value for `created`
         # throw away tags with no `photo_id`?
 
 
-class PhotosOfMeResult(ResourceResult):
+class PhotosOfMeResult(ConnectorResult):
     object_id = IntegerField()
     images = ResultField()      # contains list('height', 'source', 'width', 'height')
     created = TimestampField()
@@ -45,9 +45,12 @@ class PhotosOfMeResult(ResourceResult):
     like_info = ResultField()       # contains 'can_like', 'like_count', u'user_likes'
     album_object_id = IntegerField()
     caption = ResultField()
+    # These are added in the `source_data` class
+    comments = ResultField()
+    people_tagged = ResultField()
 
 
-class PhotosOfMeResource(FqlResource):
+class PhotosOfMeConnector(FqlConnector):
     """
     Returns all of the photos the current user is tagged in.
     """
@@ -60,7 +63,7 @@ class PhotosOfMeResource(FqlResource):
     '''
     result_class = PhotosOfMeResult
 
-    def run(self, end_datetime=None):
+    def run(self, access_token, storage=None, end_datetime=None):
         # If end_datetime is specified, append to `fql`
         fql = self.fql
         if end_datetime:
@@ -69,12 +72,12 @@ class PhotosOfMeResource(FqlResource):
         else:
             fql %= ''
 
-        return super(PhotosOfMeResource, self).run(fql)
+        return super(PhotosOfMeConnector, self).run(access_token, storage, fql)
 
     # Run process_photo_results
 
 
-class CommentsOnPhotosOfMeResult(ResourceResult):
+class CommentsOnPhotosOfMeResult(ConnectorResult):
     object_id = IntegerField()
     fromid = IntegerField()
     time = TimestampField()
@@ -83,7 +86,7 @@ class CommentsOnPhotosOfMeResult(ResourceResult):
     user_likes = ResultField()
 
 
-class CommentsOnPhotosOfMeResource(FqlResource):
+class CommentsOnPhotosOfMeConnector(FqlConnector):
     """
     Returns all comments on the photos the current user is tagged in
     """
@@ -95,12 +98,13 @@ class CommentsOnPhotosOfMeResource(FqlResource):
     '''
     result_class = CommentsOnPhotosOfMeResult
 
-    def run(self, end_datetime=None):
+    def run(self, access_token, storage=None, end_datetime=None):
         # If end_datetime is specified, append to `fql`
+        fql = self.fql
         if end_datetime:
             unix_end_time = self._convert_datetime_to_timestamp(end_datetime)
-            self.fql %= 'AND time < %s ' % unix_end_time
+            fql %= 'AND time < %s ' % unix_end_time
         else:
-            self.fql %= ''
+            fql %= ''
 
-        return super(CommentsOnPhotosOfMeResource, self).run()
+        return super(CommentsOnPhotosOfMeConnector, self).run(access_token, storage, fql)
