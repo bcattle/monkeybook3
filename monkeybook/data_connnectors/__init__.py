@@ -21,7 +21,7 @@ class DataConnectors(object):
         if name not in self.results:
             resource = DataConnectors.registry[name]()
             self.results[name] = resource.run(*args, **kwargs)
-
+        print 'got results for ' + str(name)
         return self.results[name]
 
 

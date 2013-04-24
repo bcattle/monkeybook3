@@ -16,7 +16,8 @@ class BookGenerator(object):
   def generate_book(self, data):
     print 'generating book with data ' + str(data)
     pages = []
-
+    import ipdb
+    ipdb.set_trace()
     # Preprocess
     for signal in self.config.signals:
       signal.process(data)

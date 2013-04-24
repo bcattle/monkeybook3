@@ -2,3 +2,4 @@ mongoengine
 celery-with-mongodb
 facebook-sdk
 pytz
+futures
