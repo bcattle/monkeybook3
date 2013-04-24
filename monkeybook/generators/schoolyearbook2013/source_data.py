@@ -47,8 +47,8 @@ class SchoolYearbook2013SourceData(BookSourceData):
 
         # Add the comments and tags to the photos
         for photo in self.photos:
-            photo.tagged_in_photo = photo_tags.get_by_id('object_id', photo.object_id)
-            photo.comments = comments_on_photos.get_by_id('object_id', photo.object_id),
+            photo.tagged_in_photo = photo_tags.get_by_field('object_id', photo.object_id)
+            photo.comments = comments_on_photos.get_by_field('object_id', photo.object_id),
 
 
         # Combine the two sets of wall posts
