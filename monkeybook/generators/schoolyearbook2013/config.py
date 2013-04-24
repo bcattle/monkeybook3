@@ -14,5 +14,7 @@ class BookGeneratorConfig(object):
     self.target_pages = 50
     self.max_pages = 75
 
+    self.book_start_time = datetime.datetime(2012, 1, 1, tzinfo=utc)
     self.book_end_time = datetime.datetime(2013, 5, 1, tzinfo=utc)
-    self.access_token = 'BAACEdEose0cBAEOhZB9OtuprHavggJfNU4sDq6nSjkqhbLTwC9aLUTFxX5F2GiyaoikvgqPZBTpWscodl103VhUwvHmQsiKZBBfjY0X8BpuekjQk3EYyIvckj34yFAhNOkBNa7PPqYoNCCM8EbXgTBPPbXw6O2F52NX4b6fnc29PC3oFGWlX77OOAO73ZCEdIPq5lMFdxwZDZD'
+
+    self.access_token = 'AAABnJj9SZBycBAEcdZAf6v1V3y4NQjOyFD8dZB590GYkIZAwHEtUHuKjTwriE4zm0mJlWH7DZB8bJy8ZAZC1dr9GT79euGCTS0ZD'
