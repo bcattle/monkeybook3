@@ -27,10 +27,10 @@ class OwnerPostsConnector(FqlConnector):
         extra_fql = ''
         if start_datetime:
             unix_end_time = self._convert_datetime_to_timestamp(start_datetime)
-            extra_fql += ' AND created > %s' % unix_end_time
+            extra_fql += ' AND created_time > %s' % unix_end_time
         if end_datetime:
             unix_end_time = self._convert_datetime_to_timestamp(end_datetime)
-            extra_fql += ' AND created < %s' % unix_end_time
+            extra_fql += ' AND created_time < %s' % unix_end_time
 
         fql = self.fql % (extra_fql + ' LIMIT %d' % limit)
         return super(OwnerPostsConnector, self).run(access_token, storage, fql)

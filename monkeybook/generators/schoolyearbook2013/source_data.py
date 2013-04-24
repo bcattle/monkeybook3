@@ -14,9 +14,6 @@ class SchoolYearbook2013SourceData(BookSourceData):
         ## Run all of the data connectors needed for the book
         # These need to run in parallel
 
-        import ipdb
-        ipdb.set_trace()
-
         # Photos
 
         photo_tags = self.data_connectors.run('TaggedWithMeConnector',
@@ -37,12 +34,12 @@ class SchoolYearbook2013SourceData(BookSourceData):
 
         # Wall posts
 
-        self.wall_posts = self.data_connectors.run('OwnerPostsFromYear',
+        self.wall_posts = self.data_connectors.run('OwnerPostsConnector',
                                                    access_token=self.config.access_token,
                                                    start_datetime=self.config.book_start_time,
                                                    end_datetime=self.config.book_end_time)
 
-        others_posts_from_year = self.data_connectors.run('OtherPostsFromYear',
+        others_posts_from_year = self.data_connectors.run('OthersPostsConnector',
                                                           access_token=self.config.access_token,
                                                           start_datetime=self.config.book_start_time,
                                                           end_datetime=self.config.book_end_time)

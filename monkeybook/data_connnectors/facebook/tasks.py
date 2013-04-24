@@ -36,7 +36,7 @@ class FqlTask(BaseTask):
             cache_result = self.storage.retrieve(self.fql)
             if cache_result:
                 return cache_result
-
+        print 'running ' + str(self.fql)
         fql_results = self.graph_api.fql(self.fql)
 
         # TODO: if there was an error, look in the cache as a fallback

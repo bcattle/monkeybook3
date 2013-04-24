@@ -17,6 +17,7 @@ class DataConnectors(object):
         If the DataProcessor result is in self._results,
         return it. Otherwise re-run the processor
         """
+        print 'running ' + str(name)
         if name not in self.results:
             resource = DataConnectors.registry[name]()
             self.results[name] = resource.run(*args, **kwargs)
