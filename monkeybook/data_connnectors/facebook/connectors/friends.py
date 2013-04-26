@@ -8,6 +8,10 @@ class FriendsResult(ConnectorResult):
     first_name = ResultField()
     pic_square = ResultField(required=True)
     sex = ResultField()
+    
+    @property
+    def id(self):
+      return self.uid
 
 
 class FriendsConnector(FqlConnector):

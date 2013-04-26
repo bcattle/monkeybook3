@@ -16,6 +16,9 @@ class ProfileFieldsResult(ConnectorResult):
     relationship_status = ResultField()
     sex = ResultField()
     significant_other_id = IntegerField()
+    @property
+    def id(self):
+      return self.uid
 
 
 class ProfileFieldsConnector(FqlConnector):

@@ -39,14 +39,14 @@ class SchoolYearbook2013SourceData(BookSourceData):
         # Get all the results.
         self.friends = results['FriendsConnector'].result()
         self.wall_posts = results['OwnerPostsConnector'].result()
-        self.friends = results['PhotosOfMeConnector'].result()
+        self.photos = results['PhotosOfMeConnector'].result()
         photo_tags = results['TaggedWithMeConnector'].result()
-        comment_on_photos = results['CommentsOnPhotosOfMeConnector'].result()
+        comments_on_photos = results['CommentsOnPhotosOfMeConnector'].result()
         others_posts_from_year = results['OthersPostsConnector'].result()
         
         # Add the comments and tags to the photos
         for photo in self.photos:
-            photo.tagged_in_photo = photo_tags.get_by_field('object_id', photo.object_id)
+            photo.people_tagged = photo_tags.get_by_field('object_id', photo.object_id)
             photo.comments = comments_on_photos.get_by_field('object_id', photo.object_id),
 
 

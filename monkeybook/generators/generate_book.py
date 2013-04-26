@@ -16,8 +16,6 @@ class BookGenerator(object):
   def generate_book(self, data):
     print 'generating book with data ' + str(data)
     pages = []
-    import ipdb
-    ipdb.set_trace()
     # Preprocess
     for signal in self.config.signals:
       signal.process(data)
@@ -47,7 +45,7 @@ def main():
   simple_config = BookGeneratorConfig()
   simple_config.signals.append(Signal.create('SimpleSignal', 1, 2, 3))
   simple_config.signals.append(Signal.create('SimpleSignal', 4, 5, 6))
-  simple_config.signals.append(Signal.create('SimpleSignal', 7, 8, 9, foo='bar'))
+  simple_config.signals.append(Signal.create('TaggedFriendsSignal', 7, 8, 9, foo='bar'))
 
   simple_config.page_gens.append(PageGen.create('StaticPageGen', 1, width=100, 
                                                 height=100, img='static_img.jpg'))

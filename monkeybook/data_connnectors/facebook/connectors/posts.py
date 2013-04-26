@@ -10,6 +10,9 @@ class PostsResult(ConnectorResult):
     likes  = ResultField()          # contains 'can_like', 'count', 'friends', 'href', u'sample', 'user_likes'
     message = ResultField()
     # Probably want other fields here
+    @property
+    def id(self):
+      return self.post_id
 
 
 ## Note: these can take a LONG time to run (~20 secs) if

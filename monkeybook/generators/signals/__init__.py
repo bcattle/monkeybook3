@@ -24,3 +24,4 @@ class Signal(object):
 
 # Import all the signals here, they'll be automatically added to the registry.
 import simple_signal
+import friends_signal

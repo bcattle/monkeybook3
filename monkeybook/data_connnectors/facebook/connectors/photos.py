@@ -6,8 +6,11 @@ class TaggedWithMeResult(ConnectorResult):
     object_id = IntegerField(required=True)
     subject = IntegerField()       # sometimes comes back empty
     created = TimestampField()     # 2/20: sometimes the `created` field comes back None
-
-
+    
+    @property
+    def id(self):
+      return self.object_id
+  
 class TaggedWithMeConnector(FqlConnector):
     """
     Returns all of the tags of all photos I am in
@@ -49,6 +52,10 @@ class PhotosOfMeResult(ConnectorResult):
     comments = ResultField()
     people_tagged = ResultField()
 
+    @property
+    def id(self):
+      return self.object_id
+
 
 class PhotosOfMeConnector(FqlConnector):
     """
@@ -84,6 +91,9 @@ class CommentsOnPhotosOfMeResult(ConnectorResult):
     text = ResultField()
     likes = IntegerField()
     user_likes = ResultField()
+    @property
+    def id(self):
+      return self.object_id
 
 
 class CommentsOnPhotosOfMeConnector(FqlConnector):

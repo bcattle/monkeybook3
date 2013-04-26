@@ -1,4 +1,5 @@
-import datetime, collections, copy
+import datetime, copy
+from collections import defaultdict
 from pytz import utc
 
 
@@ -91,10 +92,18 @@ class ResultsCollection(list):
     def __init__(self, *args, **kwargs):
         self._field_indices = {}
         super(ResultsCollection, self).__init__(*args, **kwargs)
-
+        
+        # Signals is a sparse mapping of friend/photo/comment ids to a value
+        # For example
+        # signals['friend_value'][friend1_id] = .75
+        # signals['friend_value'][friend2_id] = .5
+        # signals['friend_value'][friend3_id] = .9
+        # I can now easily slice and dice this structure to get the top friends
+        self.signals = defaultdict(lambda: defaultdict(int))
+        
 
     def _make_mapping_by_field(self, field_name):
-        self._field_indices[field_name] = collections.defaultdict(list)
+        self._field_indices[field_name] = defaultdict(list)
         for element in self:
             key = getattr(element, field_name)
             self._field_indices[field_name][key].append(element)
