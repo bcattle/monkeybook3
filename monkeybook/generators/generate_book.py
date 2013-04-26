@@ -43,10 +43,11 @@ def main():
   print 'Starting up'
   
   simple_config = BookGeneratorConfig()
-  simple_config.signals.append(Signal.create('SimpleSignal', 1, 2, 3))
-  simple_config.signals.append(Signal.create('SimpleSignal', 4, 5, 6))
   simple_config.signals.append(Signal.create('TaggedFriendsSignal', 7, 8, 9, foo='bar'))
+  simple_config.signals.append(Signal.create('PhotoAgeSignal', 7, 8, 9, foo='bar'))
+  simple_config.signals.append(Signal.create('PhotoCommentsLikesSignal', 7, 8, 9, foo='bar'))
   simple_config.signals.append(Signal.create('PhotoTagsSignal', 7, 8, 9, foo='bar'))
+  simple_config.signals.append(Signal.create('PhotoSumSignal', 7, 8, 9, foo='bar'))
   
 
   simple_config.page_gens.append(PageGen.create('StaticPageGen', 1, width=100, 

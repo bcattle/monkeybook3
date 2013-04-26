@@ -1,7 +1,6 @@
 from monkeybook.data_connnectors.facebook.connectors import FqlConnector
 from monkeybook.data_connnectors.results import ConnectorResult, ResultField, IntegerField, TimestampField
 
-
 class TaggedWithMeResult(ConnectorResult):
     object_id = IntegerField(required=True)
     subject = IntegerField()       # sometimes comes back empty
