@@ -116,14 +116,19 @@ class ResultsCollection(list):
     values = [getattr(result, field_name) for result in self]
     return values
 
-
-  def get_sorted_by_signal(self, signal, min_value=0, 
-                           max_elements=20, reverse=True, id_only=True):
-    values = [(k, v) for k, v in self.signals[signal].iteritems() if v > min_value]
+  def get_sorted_by_signal(self, signal, min_value=None, 
+                           max_elements=None, reverse=True, id_only=False):
+    values = [(k, v) for k, v in self.signals[signal].iteritems() 
+              if min_value is None or v > min_value]
     values.sort(key=lambda x: x[1], reverse=reverse)
     if id_only:
       values = [k for k, v in values]
     return values[:max_elements]
+    
+    
+  def get_by_id(self, id):
+    return self.get_by_field('id', id)[0]
+  
   def get_by_field(self, field_name, value):
     """
     Allows the collection to be indexed by any
