@@ -26,6 +26,7 @@ class Page(Document):
   # a relative page index (0..1) or a next/previous page. The book orderer takes
   # previous/next page, page_index, relative_index into account in that order.
   # This value can be negative to indicate pages at the end of the book.
+  # Absolte page index must be positive or negative. Not zero.
   page_index = IntField()
   relative_index = FloatField()
   previous_page = ReferenceField('Page')
@@ -49,3 +50,18 @@ class Page(Document):
     img = Image(width, height, pos_x, pos_y)
     self.images.append(img)
     return img
+    
+  def __str__(self):
+    index = ''
+    ret = ''
+    if self.relative_index:
+      index += 'rel index ' + str(self.relative_index)
+    if self.page_index:
+      index += 'page index ' + str(self.page_index)
+    if self.previous_page:
+      ret += '<-'
+    ret +=  '%s %d images' % (index,
+                              len(self.images))
+    if self.next_page:
+      ret += '->'
+    return ret

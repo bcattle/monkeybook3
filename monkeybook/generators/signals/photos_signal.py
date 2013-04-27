@@ -83,8 +83,6 @@ class PhotoSumSignal(Signal):
     
     vals =  data.photos.get_sorted_by_signal(self.signal_name)
     print vals[:10]
-    import ipdb
-    ipdb.set_trace()
 
 
 # The sum of all friends tagged values.

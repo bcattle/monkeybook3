@@ -36,9 +36,48 @@ class BookGenerator(object):
     print 'saving book'
 
   def order_pages(self, pages):
+    # This is messy needs to be cleaned up.
     print 'ordering pages'
-    return pages
-
+    print pages
+    starting_pages = pages
+    starting_len = len(pages)
+    # Set aside pages with previous_page (rel_index, positive page_index) and next_page (negative page_index)
+    # assert 1 page with positive index and no previous_page
+    # page 1, and other next page
+    # relative pages next
+    # next pages after that
+    # assumes only one set of beginning and ending pages, everything else is relative.
+    last_page = None
+    first_page = None
+    relative_pages = []
+    for page in pages:
+      if page.page_index != None and page.page_index > 0 and not page.previous_page:
+        assert not first_page, 'Ambigious first pages %s %s' % (first_page, page)
+        print 'first page found ' + str(page)
+        first_page = page
+        
+      if page.page_index != None and page.page_index < 0 and not page.previous_page:
+        assert not last_page, 'Ambigious last pages %s %s' % (last_page, page)
+        print 'last page found (sort of) ' + str(page)
+        last_page = page
+      
+      if page.relative_index and not page.previous_page:
+        print 'adding relative page ' + str(page)
+        relative_pages.append(page)
+    
+    relative_pages.sort(key=lambda p: p.relative_index)
+    
+    pages = [first_page] + relative_pages + [last_page]
+    final_pages = []
+    for page in pages:
+      while page:
+        final_pages.append(page)
+        page = page.next_page
+    print 'final ' + str(final_pages)
+        
+    assert starting_len == len(final_pages), 'page count mismatch'
+    return final_pages
+    
 def main():
   print 'Starting up'
   
@@ -50,8 +89,27 @@ def main():
   simple_config.signals.append(Signal.create('PhotoSumSignal', 7, 8, 9, foo='bar'))
   
 
-  simple_config.page_gens.append(PageGen.create('StaticPageGen', 1, width=100, 
-                                                height=100, img='static_img.jpg'))
+  simple_config.page_gens.append(PageGen.create('StaticPageGen', width=100, 
+                                                page_index = 1, height=100, 
+                                                background_images=['c0', 'c1', 'c2', 'c3']))
+
+  simple_config.page_gens.append(PageGen.create('StaticPageGen', width=100, 
+                                                page_index = -1, height=100, 
+                                                background_images=['b0', 'b1', 'b2', 'b3']))
+                                                
+  simple_config.page_gens.append(PageGen.create('StaticPageGen', width=100, 
+                                                relative_index = .5, height=100, 
+                                                background_images=['s.50', 's.51', 's.52', 's.53']))
+                                                
+  for i in xrange(8):
+    relative = (i + 1) / float(10)
+    simple_config.page_gens.append(PageGen.create('StaticPageGen', width=100, 
+                                                  relative_index = relative, height=100, 
+                                                  background_images=[str(i)+'0']))
+                                                
+                                                
+
+                                                
   simple_config.page_gens.append(PageGen.create('SimplePageGen', 1, 2))
   simple_config.page_gens.append(PageGen.create('SimplePageGen', 3, 4, foo2='bar2'))
 
